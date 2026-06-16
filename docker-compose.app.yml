@@ -1,0 +1,15 @@
+version: "3.8"
+services:
+  llm-medication-spellcheck:
+    build:
+      context: .
+      args:
+        PORT: ${PORT}      
+    restart: unless-stopped
+    environment:
+      APIKEY: ${APIKEY}
+      PORT: 8081
+    ports:
+      - 8081:8081
+    volumes:
+      - .:/app

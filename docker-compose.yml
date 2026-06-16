@@ -1,0 +1,49 @@
+version: "3.8"
+services:
+  yarn-install:
+    extends:
+      file: ../../docker-compose.yml
+      service: yarn-install
+
+  frontend:
+    extends:
+      file: ../../docker-compose.yml
+      service: frontend
+
+  backend:
+    extends:
+      file: ../../docker-compose.yml
+      service: backend
+    networks:
+      tbnetwork:
+      default:
+
+  mongo:
+    extends:
+      file: ../../docker-compose.yml
+      service: mongo
+
+  llm-medication-spellcheck:
+    build:
+      context: .
+      args:
+        PORT: ${PORT}      
+    restart: unless-stopped
+    environment:
+      APIKEY: ${APIKEY}
+      PORT: 8081
+    networks:
+      tbnetwork:
+    volumes:
+      - .:/app
+
+networks:
+  tbnetwork:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.99.0.0/16
+      driver: default
+
+volumes:
+  mongodb:
