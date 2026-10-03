@@ -4,12 +4,13 @@ services:
     build:
       context: .
       args:
-        PORT: ${PORT}      
+        PORT: ${PORT}
     restart: unless-stopped
     environment:
-      APIKEY: ${APIKEY}
-      PORT: 8081
+      OPENAI_API_KEY: ${OPENAI_API_KEY}
+      PORT: ${PORT}
     ports:
-      - 8081:8081
+      - ${PORT}:${PORT}
     volumes:
       - .:/app
+      - /dev/null:/app/.env

@@ -1,7 +1,10 @@
 import json
+import multiprocessing
 import os
 
-from fastapi import FastAPI, Query
+from dotenv import load_dotenv
+from uvicorn import run
+from fastapi import FastAPI, File, Form, UploadFile
 from openai import OpenAI
 from typing import Annotated, Any, Dict
 
@@ -11,9 +14,8 @@ def parse_json_from_response(response) -> Dict[str, Any]:
     content = response.choices[0].message.content
     return json.loads(content)
 
-
-if 'APIKEY' in os.environ:
-    OPENAI_API_KEY = os.environ['APIKEY']
+PORT = os.getenv("PORT", 8081)
+OPENAI_API_KEY = os.getenv("OPENAI_API_KEY", "")
 
 JOINT_PROMPT = """Rol:
 Je fungeert als digitale assistent die samen met de patiënt de huidige medicatielijst opstelt.
@@ -77,9 +79,21 @@ client = OpenAI(api_key=OPENAI_API_KEY)
 
 app = FastAPI()
 
+@app.get("/healthcheck")
+async def healthcheck():
+    return {"status": "ok"}
 
-@app.get("/")
-async def check_spelling(user_input: str, intent_options: Annotated[list[str] | None, Query()] = None):
+@app.post("/")
+async def check_spelling(image: UploadFile = File(...),
+    user_input: str = Form(""),
+    prompt: str | None = Form(None),
+    intent_options: str | None = Form(None),
+    key_user_account: str | None = Form(None),
+):
+    user_input = user_input
+
+    print(user_input)
+    
     message = client.responses.parse(
         model="gpt-5.5-2026-04-23",
         instructions=JOINT_PROMPT,
@@ -98,3 +112,7 @@ async def check_spelling(user_input: str, intent_options: Annotated[list[str] | 
             return {"intent": "unknown", "connector_label": user_input}
         else:
             return {"intent": "suggestion", "connector_label": results["task2_corrected"]}
+
+if __name__ == "__main__":
+    multiprocessing.freeze_support()  # For Windows support
+    run(app, host="0.0.0.0", port=PORT, reload=False, workers=1)
