@@ -84,7 +84,7 @@ async def healthcheck():
     return {"status": "ok"}
 
 @app.post("/")
-async def check_spelling(image: UploadFile = File(...),
+async def check_spelling(image: UploadFile = File(None),
     user_input: str = Form(""),
     prompt: str | None = Form(None),
     intent_options: str | None = Form(None),
