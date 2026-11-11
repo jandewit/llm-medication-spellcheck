@@ -1,4 +1,4 @@
-version: "3.8"
+name: tilbot
 services:
   yarn-install:
     extends:
@@ -27,7 +27,7 @@ services:
     build:
       context: .
       args:
-        PORT: ${PORT}      
+        PORT: ${PORT}
     restart: unless-stopped
     environment:
       OPENAI_API_KEY: ${APIKEY}
