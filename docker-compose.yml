@@ -30,7 +30,7 @@ services:
         PORT: ${PORT}      
     restart: unless-stopped
     environment:
-      APIKEY: ${APIKEY}
+      OPENAI_API_KEY: ${APIKEY}
       PORT: ${PORT}
     networks:
       tbnetwork:
